@@ -20,4 +20,13 @@ build/
 .idea/
 
 # Microsoft Office temporary files
+
+# Rust / Tauri
+target/
+
+# Environment files
+.env
+.env.local
+
+# Office temp files
 ~$*
