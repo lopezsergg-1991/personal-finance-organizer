@@ -1,0 +1,23 @@
+# macOS
+.DS_Store
+
+# Node
+node_modules/
+
+# Build
+dist/
+build/
+
+# Database
+*.db
+*.sqlite
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Microsoft Office temporary files
+~$*
