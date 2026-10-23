@@ -1,35 +1,42 @@
 import { useState } from "react";
+import type { Household } from "./types/Household";
 import "./App.css";
 
 function App() {
   const [householdName, setHouseholdName] = useState("");
-  const [createdHousehold, setCreatedHousehold] = useState("");
+  const [household, setHousehold] = useState<Household | null>(null);
   const [showMembersScreen, setShowMembersScreen] = useState(false);
 
   const [memberName, setMemberName] = useState("");
-  const [members, setMembers] = useState<string[]>([]);
 
   const handleContinue = () => {
     if (!householdName.trim()) {
       return;
     }
 
-    setCreatedHousehold(householdName);
+    setHousehold({
+      name: householdName,
+      members: [],
+    });
   };
 
   const handleAddMember = () => {
-    if (!memberName.trim()) {
+    if (!household || !memberName.trim()) {
       return;
     }
 
-    setMembers([...members, memberName]);
+    setHousehold({
+      ...household,
+      members: [...household.members, memberName],
+    });
+
     setMemberName("");
   };
 
-  if (showMembersScreen) {
+  if (showMembersScreen && household) {
     return (
       <main className="container">
-        <h1>{createdHousehold}</h1>
+        <h1>{household.name}</h1>
 
         <h2>Add Members</h2>
 
@@ -51,7 +58,7 @@ function App() {
         </button>
 
         <div style={{ marginTop: "24px" }}>
-          {members.map((member, index) => (
+          {household.members.map((member, index) => (
             <p key={index}>✅ {member}</p>
           ))}
         </div>
@@ -59,10 +66,10 @@ function App() {
     );
   }
 
-  if (createdHousehold) {
+  if (household) {
     return (
       <main className="container">
-        <h1>{createdHousehold}</h1>
+        <h1>{household.name}</h1>
 
         <h2>Getting Started</h2>
 
