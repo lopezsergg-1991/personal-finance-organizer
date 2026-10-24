@@ -1,13 +1,30 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Household } from "./types/Household";
+import { loadHousehold, saveHousehold } from "./services/householdStorage";
 import "./App.css";
 
 function App() {
   const [householdName, setHouseholdName] = useState("");
   const [household, setHousehold] = useState<Household | null>(null);
+
   const [showMembersScreen, setShowMembersScreen] = useState(false);
+  const [showIncomeScreen, setShowIncomeScreen] = useState(false);
 
   const [memberName, setMemberName] = useState("");
+
+  useEffect(() => {
+    const existingHousehold = loadHousehold();
+
+    if (existingHousehold) {
+      setHousehold(existingHousehold);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (household) {
+      saveHousehold(household);
+    }
+  }, [household]);
 
   const handleContinue = () => {
     if (!householdName.trim()) {
@@ -32,6 +49,24 @@ function App() {
 
     setMemberName("");
   };
+
+  if (showIncomeScreen && household) {
+    return (
+      <main className="container">
+        <h1>{household.name}</h1>
+
+        <h2>Add Income</h2>
+
+        <p>
+          Income setup will be implemented next.
+        </p>
+
+        <p>✅ Household Created</p>
+        <p>✅ Members Added</p>
+        <p>🚧 Income Setup In Progress</p>
+      </main>
+    );
+  }
 
   if (showMembersScreen && household) {
     return (
@@ -62,6 +97,14 @@ function App() {
             <p key={index}>✅ {member}</p>
           ))}
         </div>
+
+        <br />
+
+        <button
+          onClick={() => setShowIncomeScreen(true)}
+        >
+          Continue
+        </button>
       </main>
     );
   }
@@ -75,7 +118,13 @@ function App() {
 
         <div>
           <p>✅ Household Created</p>
-          <p>⬜ Add Members</p>
+
+          <p>
+            {household.members.length > 0
+              ? "✅ Add Members"
+              : "⬜ Add Members"}
+          </p>
+
           <p>⬜ Add Income</p>
           <p>⬜ Add Expenses</p>
           <p>⬜ Complete First Review</p>
