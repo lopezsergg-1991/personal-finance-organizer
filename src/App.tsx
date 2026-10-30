@@ -46,6 +46,7 @@ function App() {
     setHousehold({
       name: householdName,
       members: [],
+      incomes: [],
     });
   };
 
