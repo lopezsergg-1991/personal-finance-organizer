@@ -298,6 +298,12 @@ function App() {
             </p>
           ))}
         </div>
+
+        <br />
+
+        <button onClick={() => setShowExpenseScreen(true)}>
+          Continue
+        </button>
       </main>
     );
   }
