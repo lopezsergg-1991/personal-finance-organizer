@@ -10,16 +10,30 @@ describe("householdStorage", () => {
     expect(loadHousehold()).toBeNull();
   });
 
-  it("saves and loads a household with members and incomes", () => {
+  it("saves and loads a household with members, incomes, and expenses", () => {
     const household = {
       name: "Test Household",
-      members: ["Member One", "Member Two"],
+
+      members: [
+        "Member One",
+        "Member Two",
+      ],
+
       incomes: [
         {
           name: "Salary",
           amount: 7000,
           ownerType: "Member",
           ownerName: "Member One",
+        },
+      ],
+
+      expenses: [
+        {
+          name: "Mortgage",
+          amount: 2500,
+          ownerType: "Household",
+          ownerName: "Household",
         },
       ],
     };

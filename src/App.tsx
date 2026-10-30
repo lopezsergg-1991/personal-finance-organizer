@@ -93,6 +93,24 @@ const handleAddIncome = () => {
   setIncomeOwner("Household");
 };
 
+const handleContinueSetup = () => {
+  if (!household) {
+    return;
+  }
+
+  if (household.members.length === 0) {
+    setShowMembersScreen(true);
+    return;
+  }
+
+  if (household.incomes.length === 0) {
+    setShowIncomeScreen(true);
+    return;
+  }
+
+  alert("Expenses screen coming next.");
+};
+
   if (showIncomeScreen && household) {
     return (
       <main className="container">
@@ -218,7 +236,7 @@ const handleAddIncome = () => {
 
           <br />
 
-          <button onClick={() => setShowMembersScreen(true)}>
+          <button onClick={handleContinueSetup}>
             Continue Setup
           </button>
 
