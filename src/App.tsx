@@ -19,6 +19,7 @@ function App() {
 
   useEffect(() => {
     const existingHousehold = loadHousehold();
+    console.log("Loaded Household:", existingHousehold);
 
     if (existingHousehold) {
       setHousehold(existingHousehold);
@@ -94,21 +95,22 @@ const handleAddIncome = () => {
 };
 
 const handleContinueSetup = () => {
-  if (!household) {
-    return;
-  }
+  const nextStep = getCurrentOnboardingStep();
 
-  if (household.members.length === 0) {
+  if (nextStep === "members") {
     setShowMembersScreen(true);
     return;
   }
 
-  if (household.incomes.length === 0) {
+  if (nextStep === "income") {
     setShowIncomeScreen(true);
     return;
   }
 
-  alert("Expenses screen coming next.");
+  if (nextStep === "expenses") {
+    alert("Expenses screen coming next.");
+    return;
+  }
 };
 
   if (showIncomeScreen && household) {
@@ -214,6 +216,26 @@ const handleContinueSetup = () => {
     );
   }
 
+  const getCurrentOnboardingStep = () => {
+  if (!household) {
+    return "overview";
+  }
+
+  if (household.members.length === 0) {
+    return "members";
+  }
+
+  if (household.incomes.length === 0) {
+    return "income";
+  }
+
+  if (household.expenses.length === 0) {
+    return "expenses";
+  }
+
+  return "complete";
+};
+
   if (household) {
     return (
       <main className="container">
@@ -230,7 +252,7 @@ const handleContinueSetup = () => {
               : "⬜ Add Members"}
           </p>
 
-          <p>⬜ Add Income</p>
+          <p>{household.incomes.length > 0 ? "✅ Add Income" : "⬜ Add Income"}</p>
           <p>⬜ Add Expenses</p>
           <p>⬜ Complete First Review</p>
 
