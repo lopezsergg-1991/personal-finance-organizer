@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Household } from "./types/Household";
 import type { Income } from "./types/Income";
+import type { Expense } from "./types/Expense";
 import { loadHousehold, saveHousehold } from "./services/householdStorage";
 import "./App.css";
 
@@ -10,6 +11,7 @@ function App() {
 
   const [showMembersScreen, setShowMembersScreen] = useState(false);
   const [showIncomeScreen, setShowIncomeScreen] = useState(false);
+  const [showExpenseScreen, setShowExpenseScreen] = useState(false);
 
   const [memberName, setMemberName] = useState("");
 
@@ -17,12 +19,18 @@ function App() {
   const [incomeAmount, setIncomeAmount] = useState("");
   const [incomeOwner, setIncomeOwner] = useState("Household");
 
+  const [expenseName, setExpenseName] = useState("");
+  const [expenseAmount, setExpenseAmount] = useState("");
+  const [expenseOwner, setExpenseOwner] = useState("Household");
+
   useEffect(() => {
     const existingHousehold = loadHousehold();
-    console.log("Loaded Household:", existingHousehold);
 
     if (existingHousehold) {
-      setHousehold(existingHousehold);
+      setHousehold({
+        expenses: [],
+        ...existingHousehold,
+      });
     }
   }, []);
 
@@ -63,56 +71,172 @@ function App() {
     setMemberName("");
   };
 
-const handleAddIncome = () => {
-  if (
-    !household ||
-    !incomeName.trim() ||
-    !incomeAmount.trim()
-  ) {
-    return;
-  }
+  const handleAddIncome = () => {
+    if (
+      !household ||
+      !incomeName.trim() ||
+      !incomeAmount.trim()
+    ) {
+      return;
+    }
 
-  const newIncome: Income = {
-    name: incomeName,
-    amount: Number(incomeAmount),
-    ownerType:
-      incomeOwner === "Household"
-        ? "Household"
-        : "Member",
-    ownerName: incomeOwner,
+    const newIncome: Income = {
+      name: incomeName,
+      amount: Number(incomeAmount),
+      ownerType:
+        incomeOwner === "Household"
+          ? "Household"
+          : "Member",
+      ownerName: incomeOwner,
+    };
+
+    setHousehold({
+      ...household,
+      incomes: [
+        ...household.incomes,
+        newIncome,
+      ],
+    });
+
+    setIncomeName("");
+    setIncomeAmount("");
+    setIncomeOwner("Household");
   };
 
-  setHousehold({
-    ...household,
-    incomes: [
-      ...household.incomes,
-      newIncome,
-    ],
-  });
+  const handleAddExpense = () => {
+    if (
+      !household ||
+      !expenseName.trim() ||
+      !expenseAmount.trim()
+    ) {
+      return;
+    }
 
-  setIncomeName("");
-  setIncomeAmount("");
-  setIncomeOwner("Household");
-};
+    const newExpense: Expense = {
+      name: expenseName,
+      amount: Number(expenseAmount),
+      ownerType:
+        expenseOwner === "Household"
+          ? "Household"
+          : "Member",
+      ownerName: expenseOwner,
+    };
 
-const handleContinueSetup = () => {
-  const nextStep = getCurrentOnboardingStep();
+    setHousehold({
+      ...household,
+      expenses: [
+        ...household.expenses,
+        newExpense,
+      ],
+    });
 
-  if (nextStep === "members") {
-    setShowMembersScreen(true);
-    return;
+    setExpenseName("");
+    setExpenseAmount("");
+    setExpenseOwner("Household");
+  };
+
+  const getCurrentOnboardingStep = () => {
+    if (!household) {
+      return "overview";
+    }
+
+    if (household.members.length === 0) {
+      return "members";
+    }
+
+    if (household.incomes.length === 0) {
+      return "income";
+    }
+
+    if (household.expenses.length === 0) {
+      return "expenses";
+    }
+
+    return "complete";
+  };
+
+  const handleContinueSetup = () => {
+    const nextStep = getCurrentOnboardingStep();
+
+    if (nextStep === "members") {
+      setShowMembersScreen(true);
+      return;
+    }
+
+    if (nextStep === "income") {
+      setShowIncomeScreen(true);
+      return;
+    }
+
+    if (nextStep === "expenses") {
+      setShowExpenseScreen(true);
+      return;
+    }
+  };
+
+  if (showExpenseScreen && household) {
+    return (
+      <main className="container">
+        <h1>{household.name}</h1>
+
+        <h2>Add Expenses</h2>
+
+        <input
+          type="text"
+          placeholder="Expense Name"
+          value={expenseName}
+          onChange={(e) => setExpenseName(e.target.value)}
+        />
+
+        <br />
+
+        <input
+          type="number"
+          placeholder="Monthly Amount"
+          value={expenseAmount}
+          onChange={(e) => setExpenseAmount(e.target.value)}
+        />
+
+        <br />
+
+        <select
+          value={expenseOwner}
+          onChange={(e) => setExpenseOwner(e.target.value)}
+        >
+          <option value="Household">
+            Household
+          </option>
+
+          {household.members.map((member) => (
+            <option
+              key={member}
+              value={member}
+            >
+              {member}
+            </option>
+          ))}
+        </select>
+
+        <br />
+
+        <button onClick={handleAddExpense}>
+          Add Expense
+        </button>
+
+        <div style={{ marginTop: "24px" }}>
+          {household.expenses.map((expense, index) => (
+            <p key={index}>
+              ✅ {expense.name}
+              {" - "}
+              ${expense.amount}
+              {" - "}
+              {expense.ownerName}
+            </p>
+          ))}
+        </div>
+      </main>
+    );
   }
-
-  if (nextStep === "income") {
-    setShowIncomeScreen(true);
-    return;
-  }
-
-  if (nextStep === "expenses") {
-    alert("Expenses screen coming next.");
-    return;
-  }
-};
 
   if (showIncomeScreen && household) {
     return (
@@ -185,10 +309,6 @@ const handleContinueSetup = () => {
 
         <h2>Add Members</h2>
 
-        <p>
-          Add the people who belong to this household.
-        </p>
-
         <input
           type="text"
           placeholder="Member Name"
@@ -217,26 +337,6 @@ const handleContinueSetup = () => {
     );
   }
 
-  const getCurrentOnboardingStep = () => {
-  if (!household) {
-    return "overview";
-  }
-
-  if (household.members.length === 0) {
-    return "members";
-  }
-
-  if (household.incomes.length === 0) {
-    return "income";
-  }
-
-  if (household.expenses.length === 0) {
-    return "expenses";
-  }
-
-  return "complete";
-};
-
   if (household) {
     return (
       <main className="container">
@@ -253,8 +353,18 @@ const handleContinueSetup = () => {
               : "⬜ Add Members"}
           </p>
 
-          <p>{household.incomes.length > 0 ? "✅ Add Income" : "⬜ Add Income"}</p>
-          <p>⬜ Add Expenses</p>
+          <p>
+            {household.incomes.length > 0
+              ? "✅ Add Income"
+              : "⬜ Add Income"}
+          </p>
+
+          <p>
+            {household.expenses.length > 0
+              ? "✅ Add Expenses"
+              : "⬜ Add Expenses"}
+          </p>
+
           <p>⬜ Complete First Review</p>
 
           <br />
