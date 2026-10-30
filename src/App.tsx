@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Household } from "./types/Household";
+import type { Income } from "./types/Income";
 import { loadHousehold, saveHousehold } from "./services/householdStorage";
 import "./App.css";
 
@@ -11,6 +12,12 @@ function App() {
   const [showIncomeScreen, setShowIncomeScreen] = useState(false);
 
   const [memberName, setMemberName] = useState("");
+
+  const [incomeName, setIncomeName] = useState("");
+  const [incomeAmount, setIncomeAmount] = useState("");
+  const [incomeOwner, setIncomeOwner] = useState("Household");
+
+  const [incomes, setIncomes] = useState<Income[]>([]);
 
   useEffect(() => {
     const existingHousehold = loadHousehold();
@@ -25,6 +32,11 @@ function App() {
       saveHousehold(household);
     }
   }, [household]);
+
+  const handleReset = () => {
+    localStorage.clear();
+    window.location.reload();
+  };
 
   const handleContinue = () => {
     if (!householdName.trim()) {
@@ -50,6 +62,29 @@ function App() {
     setMemberName("");
   };
 
+  const handleAddIncome = () => {
+    if (!incomeName.trim() || !incomeAmount.trim()) {
+      return;
+    }
+
+    setIncomes([
+      ...incomes,
+      {
+        name: incomeName,
+        amount: Number(incomeAmount),
+        ownerType:
+          incomeOwner === "Household"
+            ? "Household"
+            : "Member",
+        ownerName: incomeOwner,
+      },
+    ]);
+
+    setIncomeName("");
+    setIncomeAmount("");
+    setIncomeOwner("Household");
+  };
+
   if (showIncomeScreen && household) {
     return (
       <main className="container">
@@ -57,13 +92,59 @@ function App() {
 
         <h2>Add Income</h2>
 
-        <p>
-          Income setup will be implemented next.
-        </p>
+        <input
+          type="text"
+          placeholder="Income Source"
+          value={incomeName}
+          onChange={(e) => setIncomeName(e.target.value)}
+        />
 
-        <p>✅ Household Created</p>
-        <p>✅ Members Added</p>
-        <p>🚧 Income Setup In Progress</p>
+        <br />
+
+        <input
+          type="number"
+          placeholder="Monthly Amount"
+          value={incomeAmount}
+          onChange={(e) => setIncomeAmount(e.target.value)}
+        />
+
+        <br />
+
+        <select
+          value={incomeOwner}
+          onChange={(e) => setIncomeOwner(e.target.value)}
+        >
+          <option value="Household">
+            Household
+          </option>
+
+          {household.members.map((member) => (
+            <option
+              key={member}
+              value={member}
+            >
+              {member}
+            </option>
+          ))}
+        </select>
+
+        <br />
+
+        <button onClick={handleAddIncome}>
+          Add Income
+        </button>
+
+        <div style={{ marginTop: "24px" }}>
+          {incomes.map((income, index) => (
+            <p key={index}>
+              ✅ {income.name}
+              {" - "}
+              ${income.amount}
+              {" - "}
+              {income.ownerName}
+            </p>
+          ))}
+        </div>
       </main>
     );
   }
@@ -100,9 +181,7 @@ function App() {
 
         <br />
 
-        <button
-          onClick={() => setShowIncomeScreen(true)}
-        >
+        <button onClick={() => setShowIncomeScreen(true)}>
           Continue
         </button>
       </main>
@@ -133,6 +212,12 @@ function App() {
 
           <button onClick={() => setShowMembersScreen(true)}>
             Continue Setup
+          </button>
+
+          <br /><br />
+
+          <button onClick={handleReset}>
+            Reset Development Data
           </button>
         </div>
       </main>
