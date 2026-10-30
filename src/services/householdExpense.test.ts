@@ -17,7 +17,6 @@ describe("household expense model", () => {
     });
 
     expect(household.expenses).toHaveLength(1);
-
     expect(household.expenses[0].name).toBe("Mortgage");
   });
 });
