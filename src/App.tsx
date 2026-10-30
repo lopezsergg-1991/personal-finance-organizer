@@ -17,8 +17,6 @@ function App() {
   const [incomeAmount, setIncomeAmount] = useState("");
   const [incomeOwner, setIncomeOwner] = useState("Household");
 
-  const [incomes, setIncomes] = useState<Income[]>([]);
-
   useEffect(() => {
     const existingHousehold = loadHousehold();
 
@@ -63,28 +61,37 @@ function App() {
     setMemberName("");
   };
 
-  const handleAddIncome = () => {
-    if (!incomeName.trim() || !incomeAmount.trim()) {
-      return;
-    }
+const handleAddIncome = () => {
+  if (
+    !household ||
+    !incomeName.trim() ||
+    !incomeAmount.trim()
+  ) {
+    return;
+  }
 
-    setIncomes([
-      ...incomes,
-      {
-        name: incomeName,
-        amount: Number(incomeAmount),
-        ownerType:
-          incomeOwner === "Household"
-            ? "Household"
-            : "Member",
-        ownerName: incomeOwner,
-      },
-    ]);
-
-    setIncomeName("");
-    setIncomeAmount("");
-    setIncomeOwner("Household");
+  const newIncome: Income = {
+    name: incomeName,
+    amount: Number(incomeAmount),
+    ownerType:
+      incomeOwner === "Household"
+        ? "Household"
+        : "Member",
+    ownerName: incomeOwner,
   };
+
+  setHousehold({
+    ...household,
+    incomes: [
+      ...household.incomes,
+      newIncome,
+    ],
+  });
+
+  setIncomeName("");
+  setIncomeAmount("");
+  setIncomeOwner("Household");
+};
 
   if (showIncomeScreen && household) {
     return (
@@ -136,7 +143,7 @@ function App() {
         </button>
 
         <div style={{ marginTop: "24px" }}>
-          {incomes.map((income, index) => (
+          {household.incomes.map((income, index) => (
             <p key={index}>
               ✅ {income.name}
               {" - "}
