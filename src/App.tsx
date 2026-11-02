@@ -4,6 +4,7 @@ import type { Income } from "./types/Income";
 import type { Expense } from "./types/Expense";
 import { loadHousehold, saveHousehold } from "./services/householdStorage";
 import "./App.css";
+import { getCurrentOnboardingStep } from "./services/onboarding";
 
 function App() {
   const [householdName, setHouseholdName] = useState("");

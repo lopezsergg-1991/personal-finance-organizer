@@ -1,29 +1,11 @@
 import { describe, expect, it } from "vitest";
-
-function getNextStep(household: {
-  members: string[];
-  incomes: unknown[];
-  expenses: unknown[];
-}) {
-  if (household.members.length === 0) {
-    return "members";
-  }
-
-  if (household.incomes.length === 0) {
-    return "income";
-  }
-
-  if (household.expenses.length === 0) {
-    return "expenses";
-  }
-
-  return "complete";
-}
+import { getCurrentOnboardingStep } from "./onboarding";
 
 describe("onboarding flow", () => {
   it("routes to members when members are missing", () => {
     expect(
-      getNextStep({
+      getCurrentOnboardingStep({
+        name: "Test Household",
         members: [],
         incomes: [],
         expenses: [],
@@ -33,7 +15,8 @@ describe("onboarding flow", () => {
 
   it("routes to income when members exist but income does not", () => {
     expect(
-      getNextStep({
+      getCurrentOnboardingStep({
+        name: "Test Household",
         members: ["Member One"],
         incomes: [],
         expenses: [],
@@ -43,9 +26,17 @@ describe("onboarding flow", () => {
 
   it("routes to expenses when income exists but expenses do not", () => {
     expect(
-      getNextStep({
+      getCurrentOnboardingStep({
+        name: "Test Household",
         members: ["Member One"],
-        incomes: [{}],
+        incomes: [
+          {
+            name: "Salary",
+            amount: 7000,
+            ownerType: "Member",
+            ownerName: "Member One",
+          },
+        ],
         expenses: [],
       })
     ).toBe("expenses");
@@ -53,10 +44,25 @@ describe("onboarding flow", () => {
 
   it("routes to complete when onboarding is complete", () => {
     expect(
-      getNextStep({
+      getCurrentOnboardingStep({
+        name: "Test Household",
         members: ["Member One"],
-        incomes: [{}],
-        expenses: [{}],
+        incomes: [
+          {
+            name: "Salary",
+            amount: 7000,
+            ownerType: "Member",
+            ownerName: "Member One",
+          },
+        ],
+        expenses: [
+          {
+            name: "Mortgage",
+            amount: 2500,
+            ownerType: "Household",
+            ownerName: "Household",
+          },
+        ],
       })
     ).toBe("complete");
   });
