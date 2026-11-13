@@ -1,3 +1,4 @@
+import type { Household } from "../types/Household";
 import { describe, expect, it, beforeEach } from "vitest";
 import { saveHousehold, loadHousehold } from "./householdStorage";
 
@@ -11,7 +12,7 @@ describe("householdStorage", () => {
   });
 
   it("saves and loads a household with members, incomes, and expenses", () => {
-    const household = {
+    const household: Household = {
       name: "Test Household",
 
       members: [
