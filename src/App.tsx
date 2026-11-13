@@ -201,11 +201,6 @@ function App() {
 
         <br />
 
-        <button onClick={goBack}>Back</button>
-        <button onClick={goToOverview}>Back to Overview</button>
-
-        <br />
-
         <button onClick={handleAddExpense}>
           Add Expense
         </button>
@@ -221,6 +216,12 @@ function App() {
             </p>
           ))}
         </div>
+
+        <br />
+
+        <button onClick={goForward}>Continue</button>
+        <button onClick={goBack}>Back</button>
+        <button onClick={goToOverview}>Back to Overview</button>
       </main>
     );
   }
@@ -270,11 +271,6 @@ function App() {
 
         <br />
 
-        <button onClick={goBack}>Back</button>
-        <button onClick={goToOverview}>Back to Overview</button>
-
-        <br />
-
         <button onClick={handleAddIncome}>
           Add Income
         </button>
@@ -296,6 +292,8 @@ function App() {
         <button onClick={goForward} disabled={household.incomes.length === 0}>
           Continue
         </button>
+        <button onClick={goBack}>Back</button>
+        <button onClick={goToOverview}>Back to Overview</button>
       </main>
     );
   }
@@ -316,11 +314,6 @@ function App() {
 
         <br />
 
-        <button onClick={goBack}>Back</button>
-        <button onClick={goToOverview}>Back to Overview</button>
-
-        <br />
-
         <button onClick={handleAddMember}>
           Add Member
         </button>
@@ -336,6 +329,8 @@ function App() {
         <button onClick={goForward} disabled={household.members.length === 0}>
           Continue
         </button>
+        <button onClick={goBack}>Back</button>
+        <button onClick={goToOverview}>Back to Overview</button>
       </main>
     );
   }
@@ -415,11 +410,10 @@ function App() {
 
         <br />
 
-        {household && <button onClick={goToOverview}>Back to Overview</button>}
-
         <button onClick={handleContinue}>
           {household ? "Save and Continue" : "Continue"}
         </button>
+        {household && <button onClick={goToOverview}>Back to Overview</button>}
       </div>
     </main>
   );
