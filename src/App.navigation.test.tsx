@@ -89,6 +89,8 @@ describe("onboarding screen navigation", () => {
     click("Back to Overview");
     click("View Income");
     shows("Salary");
+    click("Back to Overview");
+    shows("Getting Started");
     click("View Expenses");
     shows("Mortgage");
     expect(loadHousehold()).toEqual(household);
