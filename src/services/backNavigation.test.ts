@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getNextStep, getPreviousStep } from "./navigation";
+import { getNextStep, getOverviewStep, getPreviousStep } from "./navigation";
 
 describe("onboarding navigation", () => {
   it("goes from income back to members", () => {
@@ -26,6 +26,13 @@ describe("onboarding navigation", () => {
     expect(getNextStep("household")).toBe("members");
     expect(getNextStep("members")).toBe("income");
     expect(getNextStep("income")).toBe("expenses");
+  });
+
+  it("supports returning directly to overview from every setup screen", () => {
+    expect(getOverviewStep("household")).toBe("overview");
+    expect(getOverviewStep("members")).toBe("overview");
+    expect(getOverviewStep("income")).toBe("overview");
+    expect(getOverviewStep("expenses")).toBe("overview");
   });
 
   it("returns to overview after expenses", () => {

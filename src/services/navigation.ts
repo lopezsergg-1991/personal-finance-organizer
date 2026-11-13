@@ -18,3 +18,8 @@ export function getNextStep(currentStep: OnboardingStep): OnboardingStep {
     default: return "overview";
   }
 }
+
+/** Jump to the household summary from any onboarding step. */
+export function getOverviewStep(_currentStep: OnboardingStep): OnboardingStep {
+  return "overview";
+}

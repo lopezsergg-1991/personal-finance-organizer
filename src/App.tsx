@@ -5,7 +5,7 @@ import type { Expense } from "./types/Expense";
 import { loadHousehold, saveHousehold } from "./services/householdStorage";
 import "./App.css";
 import { getCurrentOnboardingStep } from "./services/onboarding";
-import { getNextStep, getPreviousStep } from "./services/navigation";
+import { getNextStep, getOverviewStep, getPreviousStep } from "./services/navigation";
 import type { OnboardingStep } from "./types/OnboardingStep";
 
 function App() {
@@ -148,8 +148,13 @@ function App() {
     }
   };
 
-  const goBack = () => setStep(getPreviousStep(step));
+  const goBack = () => {
+    // Make the saved household name available when returning to its edit screen.
+    if (step === "members" && household) setHouseholdName(household.name);
+    setStep(getPreviousStep(step));
+  };
   const goForward = () => setStep(getNextStep(step));
+  const goToOverview = () => setStep(getOverviewStep(step));
 
   if (step === "expenses" && household) {
     return (
@@ -197,6 +202,7 @@ function App() {
         <br />
 
         <button onClick={goBack}>Back</button>
+        <button onClick={goToOverview}>Back to Overview</button>
 
         <br />
 
@@ -215,8 +221,6 @@ function App() {
             </p>
           ))}
         </div>
-
-        <button onClick={() => setStep("overview")}>Back to Overview</button>
       </main>
     );
   }
@@ -267,6 +271,7 @@ function App() {
         <br />
 
         <button onClick={goBack}>Back</button>
+        <button onClick={goToOverview}>Back to Overview</button>
 
         <br />
 
@@ -312,6 +317,7 @@ function App() {
         <br />
 
         <button onClick={goBack}>Back</button>
+        <button onClick={goToOverview}>Back to Overview</button>
 
         <br />
 
@@ -409,7 +415,7 @@ function App() {
 
         <br />
 
-        {household && <button onClick={() => setStep("overview")}>Back to Overview</button>}
+        {household && <button onClick={goToOverview}>Back to Overview</button>}
 
         <button onClick={handleContinue}>
           {household ? "Save and Continue" : "Continue"}
