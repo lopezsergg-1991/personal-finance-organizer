@@ -1,26 +1,34 @@
 import { describe, expect, it } from "vitest";
-import { getPreviousStep } from "./navigation";
+import { getNextStep, getPreviousStep } from "./navigation";
 
-describe("back navigation", () => {
-  it("returns members from income", () => {
-    expect(
-      getPreviousStep("income")
-    ).toBe("members");
+describe("onboarding navigation", () => {
+  it("goes from income back to members", () => {
+    expect(getPreviousStep("income")).toBe("members");
   });
 
-  it("returns income from expenses", () => {
-    expect(
-      getPreviousStep("expenses")
-    ).toBe("income");
+  it("goes from expenses back to income", () => {
+    expect(getPreviousStep("expenses")).toBe("income");
   });
 
-  it("returns overview for unknown steps", () => {
+  it("goes from members back to household details", () => {
+    expect(getPreviousStep("members")).toBe("household");
+  });
+
+  it("goes from household details back to overview", () => {
+    expect(getPreviousStep("household")).toBe("overview");
+  });
+
+  it("handles unknown steps", () => {
     expect(getPreviousStep("unknown")).toBe("overview");
   });
 
-  it("returns overview from members", () => {
-    expect(
-      getPreviousStep("members")
-    ).toBe("overview");
+  it("moves forward through the setup screens", () => {
+    expect(getNextStep("household")).toBe("members");
+    expect(getNextStep("members")).toBe("income");
+    expect(getNextStep("income")).toBe("expenses");
+  });
+
+  it("returns to overview after expenses", () => {
+    expect(getNextStep("expenses")).toBe("overview");
   });
 });

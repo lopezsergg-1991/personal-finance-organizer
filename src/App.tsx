@@ -5,15 +5,14 @@ import type { Expense } from "./types/Expense";
 import { loadHousehold, saveHousehold } from "./services/householdStorage";
 import "./App.css";
 import { getCurrentOnboardingStep } from "./services/onboarding";
-import { getPreviousStep } from "./services/navigation";
+import { getNextStep, getPreviousStep } from "./services/navigation";
+import type { OnboardingStep } from "./types/OnboardingStep";
 
 function App() {
   const [householdName, setHouseholdName] = useState("");
   const [household, setHousehold] = useState<Household | null>(null);
 
-  const [showMembersScreen, setShowMembersScreen] = useState(false);
-  const [showIncomeScreen, setShowIncomeScreen] = useState(false);
-  const [showExpenseScreen, setShowExpenseScreen] = useState(false);
+  const [step, setStep] = useState<OnboardingStep>("overview");
 
   const [memberName, setMemberName] = useState("");
 
@@ -52,12 +51,17 @@ function App() {
       return;
     }
 
-    setHousehold({
-      name: householdName,
-      members: [],
-      incomes: [],
-      expenses: [],
-    });
+    if (household) {
+      setHousehold({ ...household, name: householdName.trim() });
+    } else {
+      setHousehold({
+        name: householdName.trim(),
+        members: [],
+        incomes: [],
+        expenses: [],
+      });
+    }
+    setStep("members");
   };
 
   const handleAddMember = () => {
@@ -138,27 +142,16 @@ function App() {
   };
 
   const handleContinueSetup = () => {
-    if (!household) return;
-
-    const nextStep = getCurrentOnboardingStep(household);
-
-    if (nextStep === "members") {
-      setShowMembersScreen(true);
-      return;
-    }
-
-    if (nextStep === "income") {
-      setShowIncomeScreen(true);
-      return;
-    }
-
-    if (nextStep === "expenses") {
-      setShowExpenseScreen(true);
-      return;
+    if (household) {
+      const nextStep = getCurrentOnboardingStep(household);
+      if (nextStep !== "complete") setStep(nextStep);
     }
   };
 
-  if (showExpenseScreen && household) {
+  const goBack = () => setStep(getPreviousStep(step));
+  const goForward = () => setStep(getNextStep(step));
+
+  if (step === "expenses" && household) {
     return (
       <main className="container">
         <h1>{household.name}</h1>
@@ -203,16 +196,7 @@ function App() {
 
         <br />
 
-        <button
-          onClick={() => {
-            if (getPreviousStep("expenses") === "income") {
-              setShowExpenseScreen(false);
-              setShowIncomeScreen(true);
-            }
-          }}
-        >
-          Back
-        </button>
+        <button onClick={goBack}>Back</button>
 
         <br />
 
@@ -231,11 +215,13 @@ function App() {
             </p>
           ))}
         </div>
+
+        <button onClick={() => setStep("overview")}>Back to Overview</button>
       </main>
     );
   }
 
-  if (showIncomeScreen && household) {
+  if (step === "income" && household) {
     return (
       <main className="container">
         <h1>{household.name}</h1>
@@ -280,6 +266,10 @@ function App() {
 
         <br />
 
+        <button onClick={goBack}>Back</button>
+
+        <br />
+
         <button onClick={handleAddIncome}>
           Add Income
         </button>
@@ -298,14 +288,14 @@ function App() {
 
         <br />
 
-        <button onClick={() => setShowExpenseScreen(true)}>
+        <button onClick={goForward} disabled={household.incomes.length === 0}>
           Continue
         </button>
       </main>
     );
   }
 
-  if (showMembersScreen && household) {
+  if (step === "members" && household) {
     return (
       <main className="container">
         <h1>{household.name}</h1>
@@ -321,6 +311,10 @@ function App() {
 
         <br />
 
+        <button onClick={goBack}>Back</button>
+
+        <br />
+
         <button onClick={handleAddMember}>
           Add Member
         </button>
@@ -333,14 +327,14 @@ function App() {
 
         <br />
 
-        <button onClick={() => setShowIncomeScreen(true)}>
+        <button onClick={goForward} disabled={household.members.length === 0}>
           Continue
         </button>
       </main>
     );
   }
 
-  if (household) {
+  if (household && step === "overview") {
     return (
       <main className="container">
         <h1>{household.name}</h1>
@@ -372,9 +366,16 @@ function App() {
 
           <br />
 
-          <button onClick={handleContinueSetup}>
+          <button onClick={handleContinueSetup} disabled={getCurrentOnboardingStep(household) === "complete"}>
             Continue Setup
           </button>
+
+          <br /><br />
+
+          <button onClick={() => { setHouseholdName(household.name); setStep("household"); }}>Edit Household Name</button>
+          <button onClick={() => setStep("members")}>Edit Members</button>
+          <button onClick={() => setStep("income")}>View Income</button>
+          <button onClick={() => setStep("expenses")}>View Expenses</button>
 
           <br /><br />
 
@@ -390,9 +391,9 @@ function App() {
     <main className="container">
       <h1>Personal Finance Organizer</h1>
 
-      <h2>Welcome</h2>
+      <h2>{household ? "Edit Household Name" : "Welcome"}</h2>
 
-      <p>Let's create your household.</p>
+      <p>{household ? "Update the household name without losing your financial data." : "Let\'s create your household."}</p>
 
       <div>
         <label>Household Name</label>
@@ -408,8 +409,10 @@ function App() {
 
         <br />
 
+        {household && <button onClick={() => setStep("overview")}>Back to Overview</button>}
+
         <button onClick={handleContinue}>
-          Continue
+          {household ? "Save and Continue" : "Continue"}
         </button>
       </div>
     </main>
