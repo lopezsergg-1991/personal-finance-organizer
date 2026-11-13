@@ -1,29 +1,31 @@
 import type { Household } from "../types/Household";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
+import { loadHousehold, saveHousehold } from "./householdStorage";
 
-describe("expense persistence model", () => {
-  it("stores expenses inside household", () => {
-    const household: Household = {
-      name: "Test Household",
-      members: ["Sergio"],
+describe("expense persistence after editing the household", () => {
+  beforeEach(() => localStorage.clear());
+
+  it("preserves existing expenses when other household information changes", () => {
+    const original: Household = {
+      name: "Original Household",
+      members: ["Member One"],
       incomes: [],
-      expenses: [],
+      expenses: [{
+        name: "Mortgage",
+        amount: 2500,
+        ownerType: "Household",
+        ownerName: "Household",
+      }],
     };
 
-    household.expenses.push({
-      name: "Mortgage",
-      amount: 2500,
-      ownerType: "Household",
-      ownerName: "Household",
-    });
+    saveHousehold(original);
+    const stored = loadHousehold();
+    expect(stored).not.toBeNull();
 
-    expect(household.expenses).toHaveLength(1);
+    saveHousehold({ ...stored!, name: "Renamed Household" });
 
-    expect(household.expenses[0]).toEqual({
-      name: "Mortgage",
-      amount: 2500,
-      ownerType: "Household",
-      ownerName: "Household",
-    });
+    const reloaded = loadHousehold();
+    expect(reloaded?.name).toBe("Renamed Household");
+    expect(reloaded?.expenses).toEqual(original.expenses);
   });
 });

@@ -1,15 +1,17 @@
 import type { Household } from "../types/Household";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
+import { loadHousehold, saveHousehold } from "./householdStorage";
 
-describe("household income model", () => {
-  it("adds income to a household", () => {
+describe("household income persistence", () => {
+  beforeEach(() => localStorage.clear());
+
+  it("saves income ownership and amount across a storage round trip", () => {
     const household: Household = {
       name: "Test Household",
       members: ["Member One"],
       incomes: [],
       expenses: [],
     };
-
     household.incomes.push({
       name: "Salary",
       amount: 7000,
@@ -17,8 +19,14 @@ describe("household income model", () => {
       ownerName: "Member One",
     });
 
-    expect(household.incomes).toHaveLength(1);
+    saveHousehold(household);
+    const loaded = loadHousehold();
 
-    expect(household.incomes[0].name).toBe("Salary");
+    expect(loaded?.incomes).toEqual([{
+      name: "Salary",
+      amount: 7000,
+      ownerType: "Member",
+      ownerName: "Member One",
+    }]);
   });
 });
