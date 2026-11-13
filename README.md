@@ -1,20 +1,21 @@
-Personal Finance Organizer
+# Personal Finance Organizer
+
 Personal Finance Organizer is a desktop-first and local-first financial organization assistant.
 
-Current Status
-System Design Phase
+## Current status
 
-Documentation
-See:
+MVP development in progress. Current implementation includes household onboarding and initial income/expense entry; some planned features remain design-only.
 
-docs/SystemDesign/
+## Start or resume development
 
-Vision
-Help households organize:
+**Read [PROJECT_STATUS.md](PROJECT_STATUS.md) first.** It records the current milestone, active branch, development and testing workflow, verified results, remaining work, and session handoff procedure.
 
-Income
-Expenses
-Accounts
-Budgets
-Cash Flow
-through a guided monthly review process.
+## Documentation
+
+- [Living system design and supporting specifications](docs/SystemDesign/)
+- [Documentation governance](docs/Documentation_Governance.md)
+- [Project context](docs/Copilot/project-context.md)
+
+## Vision
+
+Help households organize income, expenses, accounts, budgets, and cash flow through a guided monthly review process.
