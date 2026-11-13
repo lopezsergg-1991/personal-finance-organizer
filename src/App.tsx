@@ -5,6 +5,7 @@ import type { Expense } from "./types/Expense";
 import { loadHousehold, saveHousehold } from "./services/householdStorage";
 import "./App.css";
 import { getCurrentOnboardingStep } from "./services/onboarding";
+import { getPreviousStep } from "./services/navigation";
 
 function App() {
   const [householdName, setHouseholdName] = useState("");
@@ -29,8 +30,8 @@ function App() {
 
     if (existingHousehold) {
       setHousehold({
-        expenses: [],
         ...existingHousehold,
+        expenses: existingHousehold.expenses ?? [],
       });
     }
   }, []);
@@ -136,28 +137,10 @@ function App() {
     setExpenseOwner("Household");
   };
 
-  const getCurrentOnboardingStep = () => {
-    if (!household) {
-      return "overview";
-    }
-
-    if (household.members.length === 0) {
-      return "members";
-    }
-
-    if (household.incomes.length === 0) {
-      return "income";
-    }
-
-    if (household.expenses.length === 0) {
-      return "expenses";
-    }
-
-    return "complete";
-  };
-
   const handleContinueSetup = () => {
-    const nextStep = getCurrentOnboardingStep();
+    if (!household) return;
+
+    const nextStep = getCurrentOnboardingStep(household);
 
     if (nextStep === "members") {
       setShowMembersScreen(true);
@@ -217,6 +200,19 @@ function App() {
             </option>
           ))}
         </select>
+
+        <br />
+
+        <button
+          onClick={() => {
+            if (getPreviousStep("expenses") === "income") {
+              setShowExpenseScreen(false);
+              setShowIncomeScreen(true);
+            }
+          }}
+        >
+          Back
+        </button>
 
         <br />
 

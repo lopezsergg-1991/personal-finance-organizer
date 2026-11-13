@@ -2,19 +2,23 @@ import { describe, expect, it } from "vitest";
 import { getPreviousStep } from "./navigation";
 
 describe("back navigation", () => {
-  it("returns from income to members", () => {
+  it("returns members from income", () => {
     expect(
       getPreviousStep("income")
     ).toBe("members");
   });
 
-  it("returns from expenses to income", () => {
+  it("returns income from expenses", () => {
     expect(
       getPreviousStep("expenses")
     ).toBe("income");
   });
 
-  it("returns from members to overview", () => {
+  it("returns overview for unknown steps", () => {
+    expect(getPreviousStep("unknown")).toBe("overview");
+  });
+
+  it("returns overview from members", () => {
     expect(
       getPreviousStep("members")
     ).toBe("overview");

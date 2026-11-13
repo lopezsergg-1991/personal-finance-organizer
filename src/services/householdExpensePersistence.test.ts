@@ -1,8 +1,9 @@
+import type { Household } from "../types/Household";
 import { describe, expect, it } from "vitest";
 
 describe("expense persistence model", () => {
   it("stores expenses inside household", () => {
-    const household = {
+    const household: Household = {
       name: "Test Household",
       members: ["Sergio"],
       incomes: [],

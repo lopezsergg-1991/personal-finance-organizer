@@ -1,8 +1,9 @@
+import type { Household } from "../types/Household";
 import { describe, expect, it } from "vitest";
 
 describe("household expense model", () => {
   it("adds expense to a household", () => {
-    const household = {
+    const household: Household = {
       name: "Test Household",
       members: ["Member One"],
       incomes: [],
